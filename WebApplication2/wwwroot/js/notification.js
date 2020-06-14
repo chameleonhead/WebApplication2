@@ -4,12 +4,8 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/notificationHub").
 
 document.getElementById("sendButton").disabled = true;
 
-connection.on("DataUpdated", function (user, message) {
-    var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    var encodedMsg = user + " says " + msg;
-    var li = document.createElement("li");
-    li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
+connection.on("DataUpdated", function () {
+    updateMessages();
 });
 
 connection.start().then(function () {
@@ -17,3 +13,21 @@ connection.start().then(function () {
 }).catch(function (err) {
     return console.error(err.toString());
 });
+
+updateMessages();
+
+function updateMessages() {
+    fetch('/messages')
+        .then(res => res.json())
+        .then(data => {
+            var ul = document.getElementById("messagesList");
+            ul.innerHTML = '';
+            data.forEach(function (e) {
+                var msg = e.value && e.value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                var li = document.createElement("li");
+                li.textContent = msg;
+                ul.appendChild(li);
+            });
+        });
+    document.getElementById("messagesList").appendChild(li);
+}
