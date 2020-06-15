@@ -1,0 +1,23 @@
+version: '3'
+services:
+  dotnet:
+    build: 
+      context: ./docker/dotnet
+    ports:
+      - 5000:5000
+      - 5001:5001
+    volumes:
+      - ./WebApplication2:/app
+    environment:
+      - "ConnectionStrings:DefaultConnection=Server=sqlserver,1433;Database=WebApplication2;Persist Security Info=True;User ID=sa;Password=P@ssw0rd;MultipleActiveResultSets=true"
+    depends_on:
+      - sqlserver
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-CU3-ubuntu-18.04
+    ports:
+      - 1433:1433
+    volumes:
+      - ./docker/sqlserver/data:/var/opt/mssql
+    environment:
+      - "ACCEPT_EULA=Y"
+      - "SA_PASSWORD=P@ssw0rd"

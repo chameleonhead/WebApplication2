@@ -40,7 +40,7 @@ namespace WebApplication2
                 app.UseHsts();
             }
 
-            // ƒNƒGƒŠ’Ê’m‚ÌˆË‘¶«
+            // ã‚¯ã‚¨ãƒªé€šçŸ¥ã®ä¾å­˜æ€§
             app.UseNotification(applicationLifetime);
 
             app.UseHttpsRedirection();
