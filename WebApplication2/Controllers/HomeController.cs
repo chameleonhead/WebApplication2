@@ -40,6 +40,14 @@ namespace WebApplication2.Controllers
             return Ok();
         }
 
+        [HttpDelete("messages/all")]
+        public IActionResult ClearMessages()
+        {
+            _context.Messages.RemoveRange(_context.Messages);
+            _context.SaveChanges();
+            return Ok();
+        }
+
         public IActionResult Privacy()
         {
             return View();

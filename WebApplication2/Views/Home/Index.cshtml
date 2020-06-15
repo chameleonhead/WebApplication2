@@ -10,6 +10,7 @@
 <div>
     <input type="text" id="messageInput" />
     <button id="sendButton">Send</button>
+    <button id="clearButton">Clear</button>
     <ul id="messagesList"></ul>
 </div>
 
@@ -24,5 +25,10 @@
                 "Content-Type": "application/x-www-form-urlencoded",
             }
         })
-    })
+    });
+    document.getElementById('clearButton').addEventListener('click', function () {
+        fetch('@Url.Action("ClearMessages")', {
+            method: "delete",
+        })
+    });
 </script>
