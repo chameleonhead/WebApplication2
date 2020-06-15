@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Data;
 using System.Data.Sql;
 using System.Data.SqlClient;
 using WebApplication2.Data;
@@ -10,11 +12,9 @@ namespace WebApplication2.Hubs
 {
     public class NotificationService
     {
-        private SqlDependency dependency;
         private IServiceScope serviceScope;
         private IHubContext<NotificationHub> hubContext;
         private IConfiguration configuration;
-        private SqlConnection conn;
 
         public NotificationService(IApplicationBuilder app)
         {
@@ -31,22 +31,36 @@ namespace WebApplication2.Hubs
             {
                 context.Database.EnsureCreated();
             }
-
             SqlDependency.Start(configuration.GetConnectionString("DefaultConnection"));
-            conn = new SqlConnection(configuration.GetConnectionString("DefaultConnection"));
-            conn.Open();
-            var cmd = conn.CreateCommand();
-            this.dependency = new SqlDependency(cmd);
-            cmd.CommandText = "select * from Messages";
-            cmd.ExecuteNonQuery();
-            dependency.AddCommandDependency(cmd);
-            dependency.OnChange += Dependency_OnChange;
+            Subscribe();
+        }
+
+        private void Subscribe()
+        {
+            using (var conn = new SqlConnection(configuration.GetConnectionString("DefaultConnection")))
+            {
+                conn.Open();
+                using (var command = conn.CreateCommand())
+                {
+                    command.CommandText = "select Id, Value from dbo.Messages";
+                    command.Notification = null;
+                    var dependency = new SqlDependency(command);
+                    dependency.OnChange += Dependency_OnChange;
+                    try
+                    {
+                        command.ExecuteNonQuery();
+                    }
+                    catch (SqlException ex) when (ex.Errors[0].Number == 9202)
+                    {
+                        // http://answers.flyppdevportal.com/MVC/Post/Thread/4c367faa-4723-4994-a28b-6b7d2d2e441b?category=sqlservicebroker
+                        // Error 9202 は無視しても大丈夫
+                    }
+                }
+            }
         }
 
         public void Shutdown()
         {
-            dependency.OnChange -= Dependency_OnChange;
-            conn.Dispose();
             serviceScope.Dispose();
             SqlDependency.Stop(configuration.GetConnectionString("DefaultConnection"));
         }
@@ -54,6 +68,9 @@ namespace WebApplication2.Hubs
         private void Dependency_OnChange(object sender, SqlNotificationEventArgs e)
         {
             hubContext.Clients.All.SendAsync("DataUpdated");
+
+            // OnChangeが呼ばれるごとに新たに購読する必要がある
+            Subscribe();
         }
 
     }

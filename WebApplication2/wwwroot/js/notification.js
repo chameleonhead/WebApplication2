@@ -29,5 +29,4 @@ function updateMessages() {
                 ul.appendChild(li);
             });
         });
-    document.getElementById("messagesList").appendChild(li);
 }
