@@ -24,7 +24,7 @@ namespace WebApplication2.Controllers
         }
 
         [HttpGet("messages")]
-        public IActionResult GetMessage()
+        public IActionResult GetMessages()
         {
             return Ok(_context.Messages.ToList());
         }
@@ -44,6 +44,31 @@ namespace WebApplication2.Controllers
         public IActionResult ClearMessages()
         {
             _context.Messages.RemoveRange(_context.Messages);
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpGet("message2s")]
+        public IActionResult GetMessage2s()
+        {
+            return Ok(_context.Message2s.ToList());
+        }
+
+        [HttpPost("message2s")]
+        public IActionResult PostMessage2([FromForm(Name = "message")] string message)
+        {
+            _context.Message2s.Add(new Message2()
+            {
+                Value = message
+            });
+            _context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpDelete("message2s/all")]
+        public IActionResult ClearMessage2s()
+        {
+            _context.Message2s.RemoveRange(_context.Message2s);
             _context.SaveChanges();
             return Ok();
         }

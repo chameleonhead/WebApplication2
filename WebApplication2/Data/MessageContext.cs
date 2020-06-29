@@ -7,7 +7,8 @@ namespace WebApplication2.Data
         public MessageContext(DbContextOptions<MessageContext> options) : base(options)
         {
         }
-        
+
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Message2> Message2s { get; set; }
     }
 }

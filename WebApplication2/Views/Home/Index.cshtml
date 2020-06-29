@@ -7,11 +7,21 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-<div>
-    <input type="text" id="messageInput" />
-    <button id="sendButton">Send</button>
-    <button id="clearButton">Clear</button>
-    <ul id="messagesList"></ul>
+<div class="row">
+    <div class="col">
+        <h2>Message</h2>
+        <input type="text" id="messageInput" />
+        <button id="sendButton">Send</button>
+        <button id="clearButton">Clear</button>
+        <ul id="messagesList"></ul>
+    </div>
+    <div class="col">
+        <h2>Message2</h2>
+        <input type="text" id="messageInput2" />
+        <button id="sendButton2">Send</button>
+        <button id="clearButton2">Clear</button>
+        <ul id="messagesList2"></ul>
+    </div>
 </div>
 
 <script src="~/lib/microsoft-signalr/signalr.js"></script>
@@ -28,6 +38,21 @@
     });
     document.getElementById('clearButton').addEventListener('click', function () {
         fetch('@Url.Action("ClearMessages")', {
+            method: "delete",
+        })
+    });
+
+    document.getElementById('sendButton2').addEventListener('click', function () {
+        fetch('@Url.Action("PostMessage2")', {
+            method: "post",
+            body: 'message=' + document.getElementById("messageInput2").value,
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            }
+        })
+    });
+    document.getElementById('clearButton2').addEventListener('click', function () {
+        fetch('@Url.Action("ClearMessage2s")', {
             method: "delete",
         })
     });

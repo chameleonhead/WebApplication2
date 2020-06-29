@@ -9,5 +9,9 @@ namespace WebApplication2.Hubs
         {
             await Clients.All.SendAsync("DataUpdated", user, message);
         }
+        public async Task DataUpdated2(string user, string message)
+        {
+            await Clients.All.SendAsync("DataUpdated2", user, message);
+        }
     }
 }
